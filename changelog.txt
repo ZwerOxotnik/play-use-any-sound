@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2019-05-25
+  Bugfixes:
+    - Works better
+  Notes:
+    - Update this mod for Factorio 0.17
+    - Code refactoring
+---------------------------------------------------------------------------------------------------
+Version: 1.1.2
+Date: 2019-01-11
+  Bugfixes:
+    - Fixed unnecessary notifications in the chat
+  Notes:
+    - This update for Factorio 0.16
+---------------------------------------------------------------------------------------------------
+Version: 1.1.3
+Date: 2019-01-13
+  Bugfixes:
+    - Added checking on events creating sound titles
+  Notes:
+    - This update for Factorio 0.16
+---------------------------------------------------------------------------------------------------
+Version: 1.1.1
+Date: 2019-01-10
+  Bugfixes:
+    - Fixed /remove-sound command description
+  Notes:
+    - This update for Factorio 0.16
+---------------------------------------------------------------------------------------------------
+Version: 1.1.0
+Date: 2019-01-10
+  Features:
+    - Added command /remove-sound <event>
+    - Added mod can play sounds from chat if a title sound is found now
+    - Added Setting - play found sounds from the position of the player who wrote in the chat (for map and players)
+    - Added Setting - create sound titles (for players)
+  Changes:
+    - changed: commands
+      /sound <name> or /sound <type/name> <name/type> - plays a sound.
+      /add-sound <event/name> <name/event> or /add-sound <event> <type/name> <name/type> - plays sound at event.
+      was:
+      /sound <name> or /sound <type> <name> - play a sound.
+      /add-sound <event> <name> or /add-sound <event> <type> <name> - play sound at event.
+  Bugfixes:
+    - Fixed sounds were found and added to the mod events, but later the sounds were removed from the game, but not from the mod
+  Changes:
+    - Changes the mod description
+  Notes:
+    - This update for Factorio 0.16
+---------------------------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2019-01-08
+  Changes:
+    - changed: commands
+      /sound <name> or /sound <type/name> <name/type> - play a sound.
+      /add-sound <event/name> <name/event> or /add-sound <event> <type/name> <name/type> - play sound at event.
+      was:
+      /sound <name> or /sound <type> <name> - play a sound.
+      /add-sound <event> <name> or /add-sound <event> <type> <name> - play sound at event.
+  Notes:
+    - This update for Factorio 0.16
+---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2019-01-08
+  Notes:
+    - First release for Factorio 0.16
