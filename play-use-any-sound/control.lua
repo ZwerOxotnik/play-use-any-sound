@@ -12,7 +12,7 @@ Mod portal: https://mods.factorio.com/mod/play-use-any-sound
 
 local module = {}
 module.events = {}
-module.version = "1.2.0"
+module.version = "1.2.1"
 
 
 local function get_event(event)
@@ -42,7 +42,7 @@ end
 
 -- TODO: create rendering instead of create_entity
 local function check_need_flying_text(player, message)
-	if settings.get_player_settings(player)["flying-text-sounds"].value then
+	if script.mod_name ~= 'level' and settings.get_player_settings(player)["flying-text-sounds"].value then
 		player.surface.create_entity{name = "flying-text", position = player.position, text = message}
 	end
 end
@@ -57,6 +57,21 @@ local function is_have_event(event_name)
 	if event_name == "on_player_cheat_mode_disabled" then return true end
 	if event_name == "on_player_cheat_mode_enabled" then return true end
 	return false
+end
+
+local function play_on_event_sound(event, name_event)
+	local have_sound = global.play_sounds[event.player_index]
+	if not have_sound then return end
+	local sound_path = have_sound[name_event]
+	if not sound_path then return end
+
+	local player = game.players[event.player_index]
+	if game.is_valid_sound_path(sound_path) then
+		player.surface.play_sound{path = sound_path, position = player.position}
+		check_need_flying_text(player, string.match(sound_path, "/(.+)"))
+	else
+		have_sound[name_event] = nil
+	end
 end
 
 local function play_sound(player, text, allow_output)
@@ -217,65 +232,30 @@ local function remove_sound_command(cmd)
 end
 commands.add_command("remove-sound", {"play-use-any-sound.remove-sound-help"}, remove_sound_command)
 
-module.play_on_event_sound = function(event, name_event)
-	local have_sound = global.play_sounds[event.player_index]
-	if not have_sound then return end
-	local sound_path = have_sound[name_event]
-	if not sound_path then return end
-
-	local player = game.players[event.player_index]
-	if game.is_valid_sound_path(sound_path) then
-		player.surface.play_sound{path = sound_path, position = player.position}
-		check_need_flying_text(player, string.match(sound_path, "/(.+)"))
-	else
-		have_sound[name_event] = nil
-	end
-end
+module.play_on_event_sound = play_on_event_sound
 
 module.on_init = function()
 	global.play_sounds = {}
 end
 
+
 put_event("on_player_removed", function(event)
 	global.play_sounds[event.player_index] = nil
 end)
 
-put_event("on_pre_player_died", function(event)
-	module.play_on_event_sound(event, "on_pre_player_died")
-end)
-
-put_event("on_player_respawned", function(event)
-	module.play_on_event_sound(event, "on_player_respawned")
-end)
-
-put_event("on_rocket_launched", function(event)
-	module.play_on_event_sound(event, "on_rocket_launched")
-end)
-
-put_event("on_player_joined_game", function(event)
-	module.play_on_event_sound(event, "on_player_joined_game")
-end)
-
-put_event("on_player_promoted", function(event)
-	module.play_on_event_sound(event, "on_player_promoted")
-end)
-
-put_event("on_player_demoted", function(event)
-	module.play_on_event_sound(event, "on_player_demoted")
-end)
-
-put_event("on_player_cheat_mode_disabled", function(event)
-	module.play_on_event_sound(event, "on_player_cheat_mode_disabled")
-end)
-
-put_event("on_player_cheat_mode_enabled", function(event)
-	module.play_on_event_sound(event, "on_player_cheat_mode_enabled")
-end)
+local events_list = {"on_pre_player_died", "on_player_respawned", "on_rocket_launched", "on_player_joined_game",
+	"on_player_promoted", "on_player_demoted", "on_player_cheat_mode_disabled", "on_player_cheat_mode_enabled"
+}
+for _, event_name in pairs(events_list) do
+	put_event(event_name, function(event)
+		play_on_event_sound(event, event_name)
+	end)
+end
 
 put_event("on_console_chat", function(event)
-	if not settings.global["play-sounds-on-chat"].value then return end
+	if script.mod_name ~= 'level' and not settings.global["play-sounds-on-chat"].value then return end
 	local player = game.players[event.player_index]
-	if not settings.get_player_settings(player)["play-sounds-on-chat-user"].value then return end
+	if script.mod_name ~= 'level' and not settings.get_player_settings(player)["play-sounds-on-chat-user"].value then return end
 
 	if string.len(event.message) <= 50 then
 		play_sound(player, event.message, false)
@@ -283,19 +263,14 @@ put_event("on_console_chat", function(event)
 end)
 
 put_event("on_console_command", function(event)
-	if not settings.global["play-sounds-on-chat"].value then return end
-	if event.command == "s" or event.command == "shout" then return end
+	if script.mod_name ~= 'level' and not settings.global["play-sounds-on-chat"].value then return end
+	if event.command == "s" or event.command == "shout" then return end -- TODO: change
 	local player = game.players[event.player_index]
-	if not settings.get_player_settings(player)["play-sounds-on-chat-user"].value then return end
+	if script.mod_name ~= 'level' and not settings.get_player_settings(player)["play-sounds-on-chat-user"].value then return end
 
 	if string.len(event.parameters) <= 50 then
 		play_sound(player, event.parameters , false)
 	end
 end)
-
--- For auto handle in other places
-if auto_modules then
-	auto_modules.play_use_any_sound = module
-end
 
 return module
