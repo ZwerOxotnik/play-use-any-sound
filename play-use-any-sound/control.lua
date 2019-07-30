@@ -12,7 +12,7 @@ Mod portal: https://mods.factorio.com/mod/play-use-any-sound
 
 local module = {}
 module.events = {}
-module.version = "1.2.1"
+module.version = "1.2.2"
 
 
 local function get_event(event)
@@ -253,6 +253,8 @@ for _, event_name in pairs(events_list) do
 end
 
 put_event("on_console_chat", function(event)
+    if not event.player_index then return end
+    
 	if script.mod_name ~= 'level' and not settings.global["play-sounds-on-chat"].value then return end
 	local player = game.players[event.player_index]
 	if script.mod_name ~= 'level' and not settings.get_player_settings(player)["play-sounds-on-chat-user"].value then return end
