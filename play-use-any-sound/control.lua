@@ -235,7 +235,7 @@ commands.add_command("remove-sound", {"play-use-any-sound.remove-sound-help"}, r
 module.play_on_event_sound = play_on_event_sound
 
 module.on_init = function()
-	global.play_sounds = {}
+	global.play_sounds = global.play_sounds or {}
 end
 
 
@@ -265,6 +265,8 @@ put_event("on_console_chat", function(event)
 end)
 
 put_event("on_console_command", function(event)
+    if not event.player_index then return end
+
 	if script.mod_name ~= 'level' and not settings.global["play-sounds-on-chat"].value then return end
 	if event.command == "s" or event.command == "shout" then return end -- TODO: change
 	local player = game.players[event.player_index]
