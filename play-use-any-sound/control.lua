@@ -135,7 +135,11 @@ local function play_sound(player, text, allow_output)
 end
 
 local function play_sound_command(cmd)
-	play_sound(game.player, cmd.parameter, true)
+	-- Validation of data
+	local player = game.players[cmd.player_index]
+	if not (player and player.valid) then return end
+
+	play_sound(player, cmd.parameter, true)
 end
 commands.add_command("sound", {"play-use-any-sound.sound-help"}, play_sound_command)
 
@@ -207,7 +211,11 @@ local function add_sound(player, text)
 end
 
 local function add_sound_command(cmd)
-	add_sound(game.player, cmd.parameter)
+	-- Validation of data
+	local player = game.players[cmd.player_index]
+	if not (player and player.valid) then return end
+
+	add_sound(player, cmd.parameter)
 end
 commands.add_command("add-sound", {"play-use-any-sound.add-sound-help"}, add_sound_command)
 
@@ -257,6 +265,7 @@ put_event("on_console_chat", function(event)
     
 	if script.mod_name ~= 'level' and not settings.global["play-sounds-on-chat"].value then return end
 	local player = game.players[event.player_index]
+	if not (player and player.valid) then return end
 	if script.mod_name ~= 'level' and not settings.get_player_settings(player)["play-sounds-on-chat-user"].value then return end
 
 	if string.len(event.message) <= 50 then
@@ -270,6 +279,7 @@ put_event("on_console_command", function(event)
 	if script.mod_name ~= 'level' and not settings.global["play-sounds-on-chat"].value then return end
 	if event.command == "s" or event.command == "shout" then return end -- TODO: change
 	local player = game.players[event.player_index]
+	if not (player and player.valid) then return end
 	if script.mod_name ~= 'level' and not settings.get_player_settings(player)["play-sounds-on-chat-user"].value then return end
 
 	if string.len(event.parameters) <= 50 then
