@@ -1,13 +1,11 @@
 --[[
-
-Copyright (c) 2018-2019 ZwerOxotnik <zweroxotnik@gmail.com>
-Licensed under the MIT licence;
+Copyright (C) 2018-2019 ZwerOxotnik <zweroxotnik@gmail.com>
+Licensed under the EUPL, Version 1.2 only (the "LICENCE");
 Author: ZwerOxotnik
 
 You can write and receive any information on the links below.
 Source: https://gitlab.com/ZwerOxotnik/play-use-any-sound
 Mod portal: https://mods.factorio.com/mod/play-use-any-sound
-
 ]]--
 
 local module = {}
@@ -262,7 +260,7 @@ end
 
 put_event("on_console_chat", function(event)
     if not event.player_index then return end
-    
+
 	if script.mod_name ~= 'level' and not settings.global["play-sounds-on-chat"].value then return end
 	local player = game.players[event.player_index]
 	if not (player and player.valid) then return end
