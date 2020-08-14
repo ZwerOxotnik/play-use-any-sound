@@ -1,12 +1,12 @@
 {
     "name": "play-use-any-sound",
-    "version": "1.3.5",
-    "factorio_version": "0.18",
+    "version": "1.3.6",
+    "factorio_version": "1.0",
     "title": "Play and use any sound",
     "author": "ZwerOxotnik",
     "contact": "zweroxotnik@gmail.com, Discord:ZwerOxotnik#7117",
     "homepage": "https://www.reddit.com/r/ZwerOxotnik/",
     "source": "https://gitlab.com/ZwerOxotnik/play-use-any-sound",
     "description": "Plays any sound and use custom sounds in events and in chat. It's like an auto-soundboard with a soundboard.",
-    "dependencies": ["base", "event-listener >= 0.8.0"]
+    "dependencies": ["base", "event-listener >= 0.8.0", "zk-lib"]
 }
