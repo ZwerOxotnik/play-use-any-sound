@@ -1,5 +1,5 @@
 --[[
-Copyright (C) 2018-2019 ZwerOxotnik <zweroxotnik@gmail.com>
+Copyright (C) 2018-2020 ZwerOxotnik <zweroxotnik@gmail.com>
 Licensed under the EUPL, Version 1.2 only (the "LICENCE");
 Author: ZwerOxotnik
 
@@ -9,34 +9,6 @@ Mod portal: https://mods.factorio.com/mod/play-use-any-sound
 ]]--
 
 local module = {}
-module.events = {}
-module.version = "1.2.2"
-
-
-local function get_event(event)
-	if type(event) == "number" then
-		return event
-	else
-		return defines.events[event] --or event
-	end
-end
-
--- This function for compatibility with "Event listener" module and into other modules
-local function put_event(event, func)
-	event = get_event(event)
-	if event then
-		module.events[event] = func
-		if Event then
-			Event.register(event, func)
-		end
-		return true
-	else
-		log("The event is nil")
-		-- error("The event is nil")
-	end
-	return false
-end
-
 
 -- TODO: create rendering instead of create_entity
 local function check_need_flying_text(player, message)
@@ -139,7 +111,6 @@ local function play_sound_command(cmd)
 
 	play_sound(player, cmd.parameter, true)
 end
-commands.add_command("sound", {"play-use-any-sound.sound-help"}, play_sound_command)
 
 -- TODO: refactor this
 local function add_sound(player, text)
@@ -215,7 +186,6 @@ local function add_sound_command(cmd)
 
 	add_sound(player, cmd.parameter)
 end
-commands.add_command("add-sound", {"play-use-any-sound.add-sound-help"}, add_sound_command)
 
 local function remove_sound(player, parameter)
 	if is_have_event(parameter) then
@@ -236,7 +206,18 @@ end
 local function remove_sound_command(cmd)
 	remove_sound(game.players[cmd.player_index], string.lower(cmd.parameter))
 end
-commands.add_command("remove-sound", {"play-use-any-sound.remove-sound-help"}, remove_sound_command)
+
+module.add_commands = function()
+	commands.add_command("add-sound", {"play-use-any-sound.add-sound-help"}, add_sound_command)
+	commands.add_command("remove-sound", {"play-use-any-sound.remove-sound-help"}, remove_sound_command)
+	commands.add_command("sound", {"play-use-any-sound.sound-help"}, play_sound_command)
+end
+
+module.remove_commands = function()
+	commands.remove_command("add-sound")
+	commands.remove_command("remove-sound")
+	commands.remove_command("sound")
+end
 
 module.play_on_event_sound = play_on_event_sound
 
@@ -245,21 +226,12 @@ module.on_init = function()
 end
 
 
-put_event("on_player_removed", function(event)
+function clear_player_data(event)
 	global.play_sounds[event.player_index] = nil
-end)
-
-local events_list = {"on_pre_player_died", "on_player_respawned", "on_rocket_launched", "on_player_joined_game",
-	"on_player_promoted", "on_player_demoted", "on_player_cheat_mode_disabled", "on_player_cheat_mode_enabled"
-}
-for _, event_name in pairs(events_list) do
-	put_event(event_name, function(event)
-		play_on_event_sound(event, event_name)
-	end)
 end
 
-put_event("on_console_chat", function(event)
-    if not event.player_index then return end
+local function on_console_chat(event)
+	if not event.player_index then return end
 
 	if script.mod_name ~= 'level' and not settings.global["play-sounds-on-chat"].value then return end
 	local player = game.players[event.player_index]
@@ -269,10 +241,10 @@ put_event("on_console_chat", function(event)
 	if string.len(event.message) <= 50 then
 		play_sound(player, event.message, false)
 	end
-end)
+end
 
-put_event("on_console_command", function(event)
-    if not event.player_index then return end
+local function on_console_command(event)
+	if not event.player_index then return end
 
 	if script.mod_name ~= 'level' and not settings.global["play-sounds-on-chat"].value then return end
 	if event.command == "s" or event.command == "shout" then return end -- TODO: change
@@ -283,6 +255,21 @@ put_event("on_console_command", function(event)
 	if string.len(event.parameters) <= 50 then
 		play_sound(player, event.parameters , false)
 	end
-end)
+end
+
+module.events = {
+	[defines.events.on_console_command] = on_console_command,
+	[defines.events.on_console_chat] = on_console_chat,
+	[defines.events.on_player_removed] = clear_player_data,
+}
+
+local events_list = {"on_pre_player_died", "on_player_respawned", "on_rocket_launched", "on_player_joined_game",
+	"on_player_promoted", "on_player_demoted", "on_player_cheat_mode_disabled", "on_player_cheat_mode_enabled"
+}
+for _, event_name in pairs(events_list) do -- TODO: REFACTOR!!!
+	module.events[defines.events[event_name]] = function(event)
+		play_on_event_sound(event, event_name)
+	end
+end
 
 return module
