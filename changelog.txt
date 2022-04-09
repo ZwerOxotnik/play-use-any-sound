@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.6.0
+Date: 2022-09-04
+  Features:
+    - Safer switchable commands
+  Changes:
+    - Slightly better performance (it's already good anyway)
+    - The mod should be more stable
+    - Refactored
+  Bugfixes:
+    - Fixed sounds for /shout command
+    - Fixed minor bugs
+---------------------------------------------------------------------------------------------------
 Version: 1.5.0
 Date: 2020-12-28
   Changes:
