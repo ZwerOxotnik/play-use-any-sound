@@ -94,7 +94,8 @@ end
 
 ---@param player LuaPlayer
 ---@param text string
-local function play_sound_globally(player, text)
+---@param is_global_message boolean?
+local function play_sound_individually(player, text, is_global_message)
 	if text == "" then return end
 
 	local is_valid_sound_path = game.is_valid_sound_path
@@ -126,7 +127,13 @@ local function play_sound_globally(player, text)
 	local get_player_settings = settings.get_player_settings
 	---@type LuaPlayer.play_sound_param
 	local sound_param = {path = sound_path}
-	for _, _player in pairs(game.connected_players) do
+	local targets
+	if is_global_message then
+		targets = game.connected_players
+	else
+		targets = player.force.connected_players
+	end
+	for _, _player in pairs(targets) do
 		if _player.valid and get_player_settings(_player)["play-sounds-on-chat-user"].value then
 			_player.play_sound(sound_param)
 		end
@@ -303,7 +310,7 @@ local function on_console_chat(event)
 	local player = game.get_player(event.player_index)
 	if not (player and player.valid) then return end
 
-	play_sound_globally(player, message)
+	play_sound_individually(player, message)
 end
 
 
@@ -318,7 +325,7 @@ local function on_console_command(event)
 	local player = game.get_player(event.player_index)
 	if not (player and player.valid) then return end
 
-	play_sound_globally(player, parameters)
+	play_sound_individually(player, parameters, true)
 end
 
 
