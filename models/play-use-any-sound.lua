@@ -1,5 +1,5 @@
 --[[
-Copyright (C) 2018-2020, 2022 ZwerOxotnik <zweroxotnik@gmail.com>
+Copyright (C) 2018-2020, 2022-2023 ZwerOxotnik <zweroxotnik@gmail.com>
 Licensed under the EUPL, Version 1.2 only (the "LICENCE");
 
 You can write and receive any information on the links below.
@@ -49,7 +49,7 @@ local function check_need_flying_text(player, message)
 		return
 	end
 
-	-- TODO: create rendering instead of create_entity
+	-- TODO: perhaps, create rendering instead of create_entity
 	flying_text_data.position = player.position
 	flying_text_data.text = message
 	player.surface.create_entity(flying_text_data)
@@ -94,10 +94,9 @@ end
 
 ---@param player LuaPlayer
 ---@param text string
-local function play_sound_near_player(player, text)
+local function play_sound_globally(player, text)
 	if text == "" then return end
 
-	local surface = player.surface
 	local is_valid_sound_path = game.is_valid_sound_path
 	local sound_path
 	if is_valid_sound_path("utility/" .. text) then
@@ -123,11 +122,18 @@ local function play_sound_near_player(player, text)
 	else
 		return
 	end
-	surface_sound.path = sound_path
-	surface_sound.position = player.position
-	surface.play_sound(surface_sound)
+
+	local get_player_settings = settings.get_player_settings
+	---@type LuaPlayer.play_sound_param
+	local sound_param = {path = sound_path}
+	for _, _player in pairs(game.connected_players) do
+		if _player.valid and get_player_settings(_player)["play-sounds-on-chat-user"].value then
+			_player.play_sound(sound_param)
+		end
+	end
 	check_need_flying_text(player, text)
 end
+
 
 ---@param player LuaPlayer
 ---@param text? string
@@ -286,6 +292,8 @@ local function remove_sound(player, parameter)
 	end
 end
 
+
+---@param event EventData.on_console_chat
 local function on_console_chat(event)
 	local message = event.message
 	if #message > 50 then return end
@@ -294,11 +302,12 @@ local function on_console_chat(event)
 	if not settings.global["play-sounds-on-chat"].value then return end
 	local player = game.get_player(event.player_index)
 	if not (player and player.valid) then return end
-	-- INFO: perhaps, this \/ should be improved
-	if not settings.get_player_settings(player)["play-sounds-on-chat-user"].value then return end
-	play_sound_near_player(player, message)
+
+	play_sound_globally(player, message)
 end
 
+
+---@param event EventData.on_console_command
 local function on_console_command(event)
 	local parameters = event.parameters
 	if #parameters > 50 then return end
@@ -308,9 +317,8 @@ local function on_console_command(event)
 	if not settings.global["play-sounds-on-chat"].value then return end
 	local player = game.get_player(event.player_index)
 	if not (player and player.valid) then return end
-	-- INFO: perhaps, this \/ should be improved
-	if not settings.get_player_settings(player)["play-sounds-on-chat-user"].value then return end
-	play_sound_near_player(player, parameters)
+
+	play_sound_globally(player, parameters)
 end
 
 
