@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.6.4
+Date: 2023-07-31
+  Bugfixes:
+    - Fixes sounds during events with sounds without "types"
+  Changes:
+    - Changed order of sound detection
+---------------------------------------------------------------------------------------------------
 Version: 1.6.3
 Date: 2023-07-27
   Bugfixes:
@@ -51,13 +58,6 @@ Version: 1.2.2
 Date: 2019-07-30
   Bugfixes:
     - Fixed crash related with headless servers
-  Notes:
-    - Updated for Factorio 0.17
----------------------------------------------------------------------------------------------------
-Version: 1.2.1
-Date: 2019-06-22
-  Changes:
-    - Improved compatibility
   Notes:
     - Updated for Factorio 0.17
 ---------------------------------------------------------------------------------------------------

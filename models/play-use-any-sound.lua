@@ -86,7 +86,7 @@ local function play_on_event_sound(event, name_event)
 		surface_sound.path = sound_path
 		surface_sound.position = player.position
 		player.surface.play_sound(surface_sound)
-		check_need_flying_text(player, match(sound_path, "/(.+)"))
+		check_need_flying_text(player, match(sound_path, "/(.+)") or sound_path)
 	else
 		player_sounds[name_event] = nil
 	end
@@ -100,7 +100,10 @@ local function play_sound_individually(player, text, is_global_message)
 
 	local is_valid_sound_path = game.is_valid_sound_path
 	local sound_path
-	if is_valid_sound_path("utility/" .. text) then
+	if is_valid_sound_path(text) then
+		sound_path = text
+
+	elseif is_valid_sound_path("utility/" .. text) then
 		sound_path = "utility/" .. text
 	elseif is_valid_sound_path("ambient/" .. text) then
 		sound_path = "ambient/" .. text
@@ -118,8 +121,6 @@ local function play_sound_individually(player, text, is_global_message)
 		sound_path = "tile-build/" .. text
 	elseif is_valid_sound_path("entity-build/" .. text) then
 		sound_path = "entity-build/" .. text
-	elseif is_valid_sound_path(text) then
-		sound_path = text
 	else
 		return
 	end
@@ -157,7 +158,9 @@ local function play_sound_by_command(player, text)
 	if #params == 1 then
 		local name = params[1]
 		local sound_path
-		if is_valid_sound_path("utility/" .. name) then
+		if is_valid_sound_path(name) then
+		sound_path = name
+		elseif is_valid_sound_path("utility/" .. name) then
 			sound_path = "utility/" .. name
 		elseif is_valid_sound_path("ambient/" .. name) then
 			sound_path = "ambient/" .. name
@@ -175,8 +178,6 @@ local function play_sound_by_command(player, text)
 			sound_path = "tile-build/" .. name
 		elseif is_valid_sound_path("entity-build/" .. name) then
 			sound_path = "entity-build/" .. name
-		elseif is_valid_sound_path(name) then
-			sound_path = name
 		else
 			player.print({"cannot-found"})
 			return
