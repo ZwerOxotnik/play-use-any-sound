@@ -1,5 +1,5 @@
 --[[
-Copyright (C) 2018-2020, 2022-2023 ZwerOxotnik <zweroxotnik@gmail.com>
+Copyright (C) 2018-2020, 2022-2024 ZwerOxotnik <zweroxotnik@gmail.com>
 Licensed under the EUPL, Version 1.2 only (the "LICENCE");
 
 You can write and receive any information on the links below.
@@ -35,7 +35,7 @@ local flying_text_data = {name = "flying-text", position = {}, text = ""}
 
 ---@param name string
 function getRconData(name)
-	print_to_rcon(game.table_to_json(mod_data[name]))
+	print_to_rcon(helpers.table_to_json(mod_data[name]))
 end
 
 --#endregion
@@ -82,7 +82,7 @@ local function play_on_event_sound(event, name_event)
 	local player = game.get_player(event.player_index)
 	if not (player and player.valid) then return end
 
-	if game.is_valid_sound_path(sound_path) then
+	if helpers.is_valid_sound_path(sound_path) then
 		surface_sound.path = sound_path
 		surface_sound.position = player.position
 		player.surface.play_sound(surface_sound)
@@ -98,7 +98,7 @@ end
 local function play_sound_individually(player, text, is_global_message)
 	if text == "" then return end
 
-	local is_valid_sound_path = game.is_valid_sound_path
+	local is_valid_sound_path = helpers.is_valid_sound_path
 	local sound_path
 	if is_valid_sound_path(text) then
 		sound_path = text
@@ -147,7 +147,7 @@ end
 ---@param text? string
 local function play_sound_by_command(player, text)
 	local surface = player.surface
-	local is_valid_sound_path = game.is_valid_sound_path
+	local is_valid_sound_path = helpers.is_valid_sound_path
 	if text == nil then
 		player.print({"play-use-any-sound-commands.sound"})
 		return
@@ -216,7 +216,7 @@ local function add_sound(player, text)
 		players_sounds[player_index] = {}
 	end
 
-	local is_valid_sound_path = game.is_valid_sound_path
+	local is_valid_sound_path = helpers.is_valid_sound_path
 	if #params == 2 then
 		local event = lower(params[1])
 		local name = params[2]
@@ -331,13 +331,13 @@ end
 
 
 local function link_data()
-	mod_data = global.play_use_any_sound
+	mod_data = storage.play_use_any_sound
 	players_sounds = mod_data.players_sounds
 end
 
 local function update_global_data()
-	global.play_use_any_sound = global.play_use_any_sound or {}
-	mod_data = global.play_use_any_sound
+	storage.play_use_any_sound = storage.play_use_any_sound or {}
+	mod_data = storage.play_use_any_sound
 	mod_data.players_sounds = mod_data.players_sounds or {}
 
 	link_data()
@@ -365,7 +365,7 @@ M.on_configuration_changed = function(event)
 	local version = tonumber(gmatch(mod_changes.old_version, "%d+.%d+")())
 
 	if version < 1.16 then
-		for player_index, data in pairs(global.play_sounds) do
+		for player_index, data in pairs(storage.play_sounds) do
 			players_sounds[player_index] = data
 		end
 	end
